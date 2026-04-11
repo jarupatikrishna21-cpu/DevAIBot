@@ -1,4 +1,4 @@
-export const API_BASE = 'https://devaibotbackendkrishna.loca.lt'; // Tunneled to localhost
+export const API_BASE = 'https://devaibot-cmxj.onrender.com';
 
 export async function sendChat(message, topic, history) {
     const payload = {
@@ -9,7 +9,7 @@ export async function sendChat(message, topic, history) {
 
     const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'Bypass-Tunnel-Reminder': 'true'
         },
