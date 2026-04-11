@@ -1,4 +1,4 @@
-export const API_BASE = 'http://localhost:3000'; // Default to localhost for local automation
+export const API_BASE = 'https://devaibotbackendkrishna.loca.lt'; // Tunneled to localhost
 
 export async function sendChat(message, topic, history) {
     const payload = {
