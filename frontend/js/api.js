@@ -9,7 +9,10 @@ export async function sendChat(message, topic, history) {
 
     const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': 'true'
+        },
         body: JSON.stringify(payload)
     });
 
