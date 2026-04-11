@@ -75,18 +75,19 @@ function setupListeners() {
             currentTopic = e.target.dataset.topic;
             currentTopicTitle.textContent = `${currentTopic} Discussion`;
             updateSuggestions(currentTopic);
-            if(window.innerWidth <= 700) document.getElementById('close-sidebar').click();
+            if (window.innerWidth <= 700) document.getElementById('close-sidebar').click();
         });
     });
 
     // Welcome cards
+    // ✅ FIX — fills input only, user decides when to send
     document.querySelectorAll('.welcome-card').forEach(card => {
         card.addEventListener('click', () => {
             input.value = card.dataset.fill;
-            handleSend();
+            input.focus();
+            charCount.textContent = `${input.value.length} / 2000`;
         });
     });
-
     // Clear and Export
     document.getElementById('clear-chat').addEventListener('click', () => {
         clearHistory();
@@ -126,9 +127,11 @@ function updateSuggestions(topic) {
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.textContent = text;
+        // ✅ FIX
         btn.addEventListener('click', () => {
             input.value = text;
-            handleSend();
+            input.focus();
+            charCount.textContent = `${text.length} / 2000`;
         });
         suggestionsBar.appendChild(btn);
     });
@@ -171,16 +174,16 @@ async function handleSend() {
     try {
         const historyForApi = getHistory().slice(0, -1); // Exclude the message just added
         const response = await sendChat(text, currentTopic, historyForApi);
-        
+
         removeTypingIndicator();
-        
+
         const botMsg = { role: 'bot', content: response.reply, timestamp: new Date().toISOString() };
         saveMessage(botMsg);
-        
+
         const elapsed = Date.now() - startTime;
         updateStats(elapsed);
         updateStatsDisplay();
-        
+
         messagesArea.appendChild(renderMessage('bot', response.reply, response.tokens));
     } catch (error) {
         removeTypingIndicator();
@@ -210,5 +213,6 @@ function scrollToBottom() {
         messagesArea.scrollTop = messagesArea.scrollHeight;
     });
 }
+
 
 init();
