@@ -17,7 +17,7 @@ router.post('/chat', chatRateLimiter, validateChatInput, async (req, res, next) 
     try {
         const { message, topic, history } = req.body;
         const geminiResponse = await generateGeminiResponse(message, topic, history);
-        
+
         res.json({
             reply: geminiResponse.text,
             model: geminiResponse.model,
@@ -30,5 +30,12 @@ router.post('/chat', chatRateLimiter, validateChatInput, async (req, res, next) 
         next(error);
     }
 });
+try {
+    const response = await chat(message, topic, history);
+    res.json(response);
+} catch (err) {
+    const is429 = err.message.includes('Rate limit');
+    res.status(is429 ? 429 : 500).json({ error: err.message });
+}
 
 export default router;
