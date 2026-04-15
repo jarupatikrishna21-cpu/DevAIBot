@@ -26,7 +26,7 @@ Keep responses under 600 words. Use markdown. Never mention you are an AI.`;
     contents.push({ role: 'user', parts: [{ text: message }] });
 
     const response = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.0-flash',
         contents: contents,
         config: {
             systemInstruction: systemPrompt,
@@ -37,7 +37,7 @@ Keep responses under 600 words. Use markdown. Never mention you are an AI.`;
 
     return {
         text: response.text,
-        model: 'gemini-2.5-pro',
+        model: 'gemini-2.0-flash',
         tokens: response.usageMetadata?.candidatesTokenCount || 0
     };
 };

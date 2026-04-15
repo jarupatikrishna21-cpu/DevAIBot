@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 // Restrict CORS to GitHub Pages (or fallback to '*' during local dev if unset)
-const allowedOrigins = process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : '*';
+const allowedOrigins = process.env.CORS_ORIGIN === '*' ? '*' : (process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : '*');
 app.use(cors({
     origin: allowedOrigins,
     optionsSuccessStatus: 200

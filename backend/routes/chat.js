@@ -1,41 +1,34 @@
-import express from 'express';
-import { generateGeminiResponse } from '../services/gemini.js';
-import { chatRateLimiter } from '../middleware/rateLimiter.js';
-import { validateChatInput } from '../middleware/validator.js';
+import express from "express";
+import { generateGroqResponse } from "../services/groq.js";
 
 const router = express.Router();
 
-router.get('/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-router.post('/chat', chatRateLimiter, validateChatInput, async (req, res, next) => {
+router.post("/chat", async (req, res) => {
     try {
         const { message, topic, history } = req.body;
-        const geminiResponse = await generateGeminiResponse(message, topic, history);
 
-        res.json({
-            reply: geminiResponse.text,
-            model: geminiResponse.model,
-            tokens: geminiResponse.tokens
-        });
-    } catch (error) {
-        if (error.status === 429) {
-            return res.status(429).json({ error: 'Rate limit exceeded from Google API.' });
+        if (!message) {
+            return res.status(400).json({ error: "Message is required" });
         }
-        next(error);
+
+        const aiResponse = await generateGroqResponse(message, topic || "General DevOps", history || []);
+
+        res.json({ reply: aiResponse.text });
+
+    } catch (err) {
+        const is429 = err.message?.includes("429");
+        
+        // Let the user keep testing the frontend UI gracefully instead of breaking it!
+        if (is429) {
+            return res.json({ 
+                reply: `🤖 **(Mock Mode Active)**\n\nI received your message: *"${req.body.message}"*\n\nHowever, the Groq API returned a **Quota Exceeded** error for your API Key. Until you fix your Groq limits, you will see this mock response!` 
+            });
+        }
+
+        res.status(500).json({
+            error: err.message || "Internal Server Error"
+        });
     }
 });
-try {
-    const response = await chat(message, topic, history);
-    res.json(response);
-} catch (err) {
-    const is429 = err.message.includes('Rate limit');
-    res.status(is429 ? 429 : 500).json({ error: err.message });
-}
 
 export default router;
